@@ -26,6 +26,10 @@ export default function RootLayout({ children }) {
       <input type="text" className="search-box" placeholder="Search..."/>
       <button className="search-button">Search</button>
     </div>
+
+    <div>
+
+    </div>
     </body>
     </html>
 )

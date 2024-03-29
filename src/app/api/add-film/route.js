@@ -2,16 +2,20 @@ import {MongoClient} from "mongodb";
 
 export async function GET(request, response) {
     const {searchParams} = new URL(request.url)
-    const filmTitle = searchParams.get("film-title")
-    const apiLink = "https://www.omdbapi.com/?apikey=c52f3aa1&t=" + filmTitle + "&plot=full"
 
+    console.log("one")
+    const filmTitle = searchParams.get("film-title")
+    const apiLink = `https://www.omdbapi.com/?apikey=1012eb79&t= ${filmTitle}&plot=full&r=json`
+    console.log("two")
     const response2 = await fetch(apiLink)
     const data = await response2.json()
-
+    console.log("three")
+    console.log(data.Response)
     if (data.Response === "False")
         return Response.json({"message": "Sorry, the film '" + filmTitle +
                 "' was not able to be found."})
     else {
+        console.log("wagwan")
         const {MongoClient} = require("mongodb")
         const url = "mongodb+srv://film-findr:EBgb342FUad2oLnt@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority"
         const client = new MongoClient(url)
