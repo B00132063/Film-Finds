@@ -1,57 +1,27 @@
-import * as qna from "@tensorflow-models/qna";
-import { MongoClient } from "mongodb";
+import * as qna from "@tensorflow-models/qna"
+import * as tf from "@tensorflow/tfjs-node"
+import "@tensorflow/tfjs-backend-cpu"
+import "@tensorflow/tfjs-backend-webgl"
+import {MongoClient} from "mongodb"
 
-export async function answerQuestions(questions) {
-    const url = "mongodb://localhost:27017"; // MongoDB connection URL
-    const client = new MongoClient(url);
+export async function GET(request, response) {
+    const {MongoClient} = require("mongodb")
+    const url = "mongodb+srv://film-findr:EBgb342FUad2oLnt@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority"
+    const client = new MongoClient(url)
+    await client.connect()
 
-    try {
-        await client.connect();
+    const databaseName = "film-findr"
+    const db = client.db(databaseName)
+    const collection = db.collection("film")
+    const data = await collection.find({}).toArray()
 
-        const databaseName = "movies";
-        const db = client.db(databaseName);
-        const collection = db.collection("films");
+    const question = "What is the title of the film about the man with spider-powers?"
+    //const context = JSON.stringify(data)
+    const context = "Title: Spider-Man, Plot: A man with spider-powers does stuff"
+    const model = await qna.load()
 
-        const model = await qna.load();
+    console.log("Model is loaded")
+    const answers = await model.findAnswers(question, context)
 
-        const answers = [];
-
-        for (const question of questions) {
-            const movieTitle = question.movieTitle;
-            const questionText = question.question;
-
-            // Retrieve movie information (context) from the database
-            const movie = await collection.findOne({ title: movieTitle });
-
-            if (movie) {
-                const context = `Title: ${movie.title}, Plot: ${movie.plot}`;
-
-                // Generate answer using question-answering model
-                const answer = await model.findAnswers(questionText, context);
-
-                answers.push({ question: questionText, answer });
-            } else {
-                answers.push({ question: questionText, answer: "Movie not found" });
-            }
-        }
-
-        return answers;
-    } catch (error) {
-        console.error("Error:", error);
-        return [];
-    } finally {
-        await client.close();
-    }
+    return Response.json(answers)
 }
-
-// Example usage:
-const questions = [
-    { movieTitle: "Spider-Man", question: "What is the title of the film?" },
-    { movieTitle: "Spider-Man", question: "What is the plot of the film?" },
-    { movieTitle: "Titanic", question: "Who directed the film?" },
-    // Add more questions as needed
-];
-
-answerQuestions(questions)
-    .then(answers => console.log(answers))
-    .catch(error => console.error(error));

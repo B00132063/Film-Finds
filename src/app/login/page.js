@@ -6,6 +6,7 @@ import {
 } from "@mui/material"
 import {green} from "@mui/material/colors"
 
+
 export default function Page() {
     async function asynchronousDatabaseCall(url) {
         const response = await fetch(url)
@@ -25,7 +26,7 @@ export default function Page() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xs">
+            <Container component="background-image" maxWidth="xs">
                 <CssBaseline />
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <Avatar sx={{ m: 1, bgcolor: "secondary.main"}}></Avatar>
