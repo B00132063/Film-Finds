@@ -41,11 +41,10 @@ export default function Page({ data }) {
     const handlePopup = () => {
         // Fetch data from API
         // For demonstration purposes, let's assume 'apiLink' is your API endpoint
-        const apiLink = 'https://api.example.com/movies';
+        const apiLink = `https://www.omdbapi.com/?apikey=1012eb79&t&plot=full&r=json`;
         fetch(apiLink)
             .then(response => response.json())
             .then(data => {
-                // Display data in popup window
                 const popupWindow = window.open('', 'popupWindow', 'width=600,height=400');
                 popupWindow.document.write('<html><head><title>Movie Data</title></head><body>');
                 popupWindow.document.write('<h1>Movie Data</h1>');
