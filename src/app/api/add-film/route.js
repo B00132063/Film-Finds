@@ -10,8 +10,8 @@ export async function GET(request, response) {
     const response2 = await fetch(apiLink)
     const data = await response2.json()
     console.log("three")
-    console.log(data.Response)
-    if (data.Response === "False")
+    console.log(data.response)
+    if (data.response === "False")
         return Response.json({"message": "Sorry, the film '" + filmTitle +
                 "' was not able to be found."})
     else {

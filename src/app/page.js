@@ -1,7 +1,8 @@
-import * as React from "react";
-import { Box, Button, Container, createTheme, CssBaseline, Typography } from "@mui/material";
+import React from "react";
+import { Box, Button, Container, createTheme, CssBaseline, TextField, ThemeProvider, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { green } from "@mui/material/colors";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const theme = createTheme({
     palette: {
@@ -9,65 +10,65 @@ const theme = createTheme({
     },
 });
 
-export default function Page({ data }) {
-    let rows = [];
-    if (data) {
-        rows = data.map((item) => ({
-            id: item._id, title: item.title, year: item.year, rated: item.rated, released: item.released,
-            runtime: item.runtime, genre: item.genre, director: item.director, writer: item.writer,
-            actors: item.actors, plot: item.plot, language: item.language, country: item.country,
-            awards: item.awards, poster: item.poster
-        }));
-    }
+const rows = [
+    { id: 1, title: "Film 1", year: 2022 },
+    { id: 2, title: "Film 2", year: 2023 },
+    { id: 3, title: "Film 3", year: 2024 },
+];
 
-    const columns = [
-        { field: "id", headerName: "ID", width: 100 },
-        { field: "title", headerName: "Title", width: 100 },
-        { field: "year", headerName: "Year", width: 100 },
-        { field: "rated", headerName: "Rated", width: 100 },
-        { field: "released", headerName: "Released", width: 100 },
-        { field: "runtime", headerName: "Runtime", width: 100 },
-        { field: "genre", headerName: "Genre", width: 100 },
-        { field: "director", headerName: "Director", width: 100 },
-        { field: "writer", headerName: "Writer", width: 100 },
-        { field: "actors", headerName: "Actors", width: 100 },
-        { field: "plot", headerName: "Plot", width: 400 },
-        { field: "language", headerName: "Language", width: 100 },
-        { field: "country", headerName: "Country", width: 100 },
-        { field: "awards", headerName: "Awards", width: 100 },
-        { field: "poster", headerName: "Poster", width: 100 }
-    ];
+const columns = [
+    { field: "id", headerName: "ID", width: 90 },
+    { field: "title", headerName: "Title", width: 150 },
+    { field: "year", headerName: "Year", width: 110 },
+];
 
-    const handlePopup = () => {
-        // Fetch data from API
-        // For demonstration purposes, let's assume 'apiLink' is your API endpoint
-        const apiLink = `https://www.omdbapi.com/?apikey=1012eb79&t&plot=full&r=json`;
-        fetch(apiLink)
-            .then(response => response.json())
-            .then(data => {
-                const popupWindow = window.open('', 'popupWindow', 'width=600,height=400');
-                popupWindow.document.write('<html><head><title>Movie Data</title></head><body>');
-                popupWindow.document.write('<h1>Movie Data</h1>');
-                popupWindow.document.write('<ul>');
-                data.forEach(movie => {
-                    popupWindow.document.write(`<li>${movie.title} - ${movie.director} - ${movie.releaseDate}</li>`);
-                });
-                popupWindow.document.write('</ul></body></html>');
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    };
+const handlePopup = () => {
+    // Dummy function for handling button click
+    alert("Displaying movie data in popup");
+};
 
+export default function MyComponent() {
     return (
-        <Container component="main">
+        <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <Typography component="h1" variant="h5">FilmFindr</Typography>
-            </Box>
-            <DataGrid getRowHeight={() => "auto"} rows={rows} columns={columns}
-                      initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
-                      pageSizeOptions={[5]} checkboxSelection disableRowSelectionOnClick
-                      rowSelection="single" />
-            <Button variant="contained" onClick={handlePopup}>Display Movie Data in Popup</Button>
-        </Container>
+            <Container maxWidth="md">
+                {/* Header */}
+                <Box my={4} textAlign="center">
+                    <Typography variant="h2" component="h1" gutterBottom>FilmFindr</Typography>
+                    {/* Navigation Links */}
+                    <Box mb={2}>
+                        <Link to="/">Home</Link> | <Link to="/about">About</Link> | <Link to="/contact">Contact</Link>
+                    </Box>
+                </Box>
+
+                {/* Search Bar */}
+                <Box mb={4} textAlign="center">
+                    <TextField
+                        id="search"
+                        label="Search"
+                        variant="outlined"
+                        fullWidth
+                        // Add any search functionality here
+                    />
+                </Box>
+
+                {/* Data Grid */}
+                <DataGrid
+                    getRowHeight={() => "auto"}
+                    rows={rows}
+                    columns={columns}
+                    pageSize={5}
+                    checkboxSelection
+                    disableRowSelectionOnClick
+                    rowSelection="single"
+                    autoHeight
+                />
+
+                {/* Button */}
+                <Box mt={4} textAlign="center">
+                    <Button variant="contained" onClick={handlePopup}>Display Movie Data in Popup</Button>
+                </Box>
+            </Container>
+        </ThemeProvider>
     );
 }
