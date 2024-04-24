@@ -14,28 +14,28 @@ export async function answerQuestions(questions) {
 
         const model = await qna.load();
 
-        const answers = [];
+        const films = [];
 
         for (const question of questions) {
-            const movieTitle = question.movieTitle;
             const questionText = question.question;
 
-            // Retrieve movie information (context) from the database
-            const movie = await collection.findOne({ title: movieTitle });
+            // Generate answer using question-answering model
+            const answer = await model.findAnswers(questionText, "");
 
-            if (movie) {
-                const context = `Title: ${movie.title}, Plot: ${movie.plot}`;
+            if (answer && answer.length > 0) {
+                // Extract movie title from the answer
+                const movieTitle = answer[0].text;
 
-                // Generate answer using question-answering model
-                const answer = await model.findAnswers(questionText, context);
+                // Retrieve movie information from the database based on the movie title
+                const movie = await collection.findOne({ title: movieTitle });
 
-                answers.push({ question: questionText, answer });
-            } else {
-                answers.push({ question: questionText, answer: "Movie not found" });
+                if (movie) {
+                    films.push(movie);
+                }
             }
         }
 
-        return answers;
+        return films;
     } catch (error) {
         console.error("Error:", error);
         return [];
@@ -46,12 +46,14 @@ export async function answerQuestions(questions) {
 
 // Example usage:
 const questions = [
-    { movieTitle: "Spider-Man", question: "What is the title of the film?" },
-    { movieTitle: "Spider-Man", question: "What is the plot of the film?" },
-    { movieTitle: "Titanic", question: "Who directed the film?" },
+    { question: "What is the title of the film Spider-Man?" },
+    { question: "What is the plot of the film Titanic?" },
+    { question: "What is the title of the movie where a young boy finds a mysterious alien device?" },
+    { question: "Name the movie where a computer hacker learns about the true nature of his reality." },
+    { question: "What is the title of the movie about a retired CIA agent who travels across Europe to save his kidnapped daughter?" },
     // Add more questions as needed
 ];
 
 answerQuestions(questions)
-    .then(answers => console.log(answers))
+    .then(films => console.log(films))
     .catch(error => console.error(error));
