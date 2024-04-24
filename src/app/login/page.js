@@ -12,8 +12,7 @@ export default function Page() {
         const data = await response.json()
     }
 
-    const hand
-    leSubmit = (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
         let email = data.get("email")

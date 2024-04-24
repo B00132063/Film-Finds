@@ -1,7 +1,9 @@
+'use client'
+import RootLayout from "@/app/layout";
 import React, { useState } from "react";
 import { Container, TextField, Button, Typography, List, ListItem, ListItemText } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios"; // Import Axios for making HTTP requests
+
 
 const theme = createTheme();
 
