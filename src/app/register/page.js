@@ -53,11 +53,11 @@ export default function Page() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Film Findr
           </Typography>
-          <Button color="inherit" href="http://localhost:3010">Home</Button>
-          <Button color="inherit" href="/page2">Login</Button>
-          <Button color="inherit" href="http://localhost:3009/register">Register</Button>
+          <Button color="inherit" href="http://localhost:3000">Home</Button>
+          <Button color="inherit" href="/login">Login</Button>
+          <Button color="inherit" href="http://localhost:3000/register">Register</Button>
           <Button color="inherit" href="/page3">Profile</Button>
-          <Button color="inherit" href="http://localhost:3010/dashboard">Dashboard</Button>
+          <Button color="inherit" href="http://localhost:3000/dashboard">Dashboard</Button>
         </Toolbar>
       </AppBar>
       <Container component="main" maxWidth="xs">

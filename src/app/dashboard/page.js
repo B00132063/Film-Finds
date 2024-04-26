@@ -1,36 +1,49 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Grid, Button, CssBaseline } from '@mui/material';
+import { Box, Container, Grid, Button, CssBaseline, AppBar, Toolbar } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
 
 // Mock data for demonstration
-const mockMovies = [
-  { id: 1, title: 'Movie 1', image: 'panther.jpg', synopsis: 'Synopsis of Movie 1' },
-  { id: 2, title: 'Movie 2', image: 'grown-ups.jpeg', synopsis: 'Synopsis of Movie 2' },
-  { id: 3, title: 'Movie 3', image: 'titanic.jpeg', synopsis: 'Synopsis of Movie 3' },
-  { id: 4, title: 'Movie 4', image: 'spiderman.jpeg', synopsis: 'Synopsis of Movie 4' },
-  { id: 5, title: 'Movie 5', image: 'maze.jpeg', synopsis: 'Synopsis of Movie 5' }
-];
+useEffect(() => {
+  fetch("api/getProducts")
+      .then((res) => res.json())
+      .then((data) => {
+          setData(data);
+      });
+})
 
 const Slideshow = ({ movies }) => {
-    const [currentSlide, setCurrentSlide] = useState(0);
-  
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentSlide((prevSlide) => (prevSlide === movies.length - 1 ? 0 : prevSlide + 1));
-      }, 3000);
-  
-      return () => clearInterval(interval);
-    }, [movies]); // Make sure to include movies as a dependency
-  
-    return (
-      <Box>
-        <img src={movies[currentSlide].image} alt={movies[currentSlide].title} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} />
-      </Box>
-    );
-  };
-  
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prevSlide) => (prevSlide === movies.length - 1 ? 0 : prevSlide + 1));
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [movies]); // Make sure to include movies as a dependency
+
+  return (
+    <Box>
+      <img src={movies[currentSlide].image} alt={movies[currentSlide].title} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} />
+    </Box>
+  );
+};
+
+const NavBar = () => {
+  return (
+    <AppBar position="static">
+      <Toolbar>
+      <Button color="inherit" href="http://localhost:3000">Home</Button>
+          <Button color="inherit" href="/page2">Login</Button>
+          <Button color="inherit" href="http://localhost:3000/register">Register</Button>
+          <Button color="inherit" href="/page3">Profile</Button>
+          <Button color="inherit" href="http://localhost:3000/dashboard">Dashboard</Button>
+      </Toolbar>
+    </AppBar>
+  );
+};
 
 const Page = () => {
   const [data, setData] = useState(null);
@@ -61,6 +74,7 @@ const Page = () => {
           minHeight: '100vh',
         }}
       >
+        <NavBar />
         <Container>
           <Grid container spacing={2}>
             <Grid item xs={6}>

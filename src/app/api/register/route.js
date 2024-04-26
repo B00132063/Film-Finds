@@ -20,6 +20,8 @@ export default function RegisterPage() {
     console.log(result);
   };
 
+
+  
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

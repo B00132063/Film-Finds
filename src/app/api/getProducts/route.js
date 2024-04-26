@@ -9,11 +9,12 @@ export async function GET(req, res) {
 
     //const url = 'mongodb+srv://stevenakamelu2960:TD09ZlzK2Mnk6Oxw@cluster0.aakaopk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; 
      
-  const url = 'mongodb://localhost:27017/?authMechanism=DEFAULT';
+    const url = 'mongodb+srv://film-findr:12345678qwerty@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  
     
     const client = new MongoClient(url);
 
-    const dbName = 'apptwo'; // database name
+    const dbName = 'app'; // database name
 
 
     // stevenakamelu2960

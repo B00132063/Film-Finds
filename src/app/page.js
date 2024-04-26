@@ -44,10 +44,10 @@ export default function Page() {
             Film Findr
           </Typography>
           <Button color="inherit" href="http://localhost:3009">Home</Button>
-          <Button color="inherit" href="/page2">Login</Button>
-          <Button color="inherit" href="http://localhost:3010/register">Register</Button>
+          <Button color="inherit" href="/login">Login</Button>
+          <Button color="inherit" href="http://localhost:3000/register">Register</Button>
           <Button color="inherit" href="/page3">Profile</Button>
-          <Button color="inherit" href="http://localhost:3010/dashboard">Dashboard</Button>
+          <Button color="inherit" href="http://localhost:3000/dashboard">Dashboard</Button>
         </Toolbar>
       </AppBar>
       <Box
