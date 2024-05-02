@@ -1,104 +1,53 @@
-'use client';
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
-import Box from '@mui/material/Box';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { green, grey } from '@mui/material/colors';
+'use client'; // This is likely a comment to indicate the type of environment or client being used.
 
-export default function Page() {
-  const [searchTerm, setSearchTerm] = React.useState('');
+import * as React from 'react'; // Importing React library for building UI components.
+import CssBaseline from '@mui/material/CssBaseline'; // Importing CssBaseline component from Material-UI to reset browser styling.
+import AppBar from '@mui/material/AppBar'; // Importing AppBar component from Material-UI for creating app bars.
+import Toolbar from '@mui/material/Toolbar'; // Importing Toolbar component from Material-UI for a toolbar layout.
+import Typography from '@mui/material/Typography'; // Importing Typography component from Material-UI for text styling.
+import Button from '@mui/material/Button'; // Importing Button component from Material-UI for buttons.
+import TextField from '@mui/material/TextField'; // Importing TextField component from Material-UI for input fields.
+import IconButton from '@mui/material/IconButton'; // Importing IconButton component from Material-UI for icon buttons.
+import SearchIcon from '@mui/icons-material/Search'; // Importing SearchIcon component from Material-UI for search icon.
+import Box from '@mui/material/Box'; // Importing Box component from Material-UI for layout purposes.
+import { ThemeProvider, createTheme } from '@mui/material/styles'; // Importing ThemeProvider and createTheme from Material-UI for theming.
+import { green, grey } from '@mui/material/colors'; // Importing green and grey colors from Material-UI.
+
+export default function Page() { // Defining a React functional component named Page.
+  const [searchTerm, setSearchTerm] = React.useState(''); // Initializing state for search term using React.useState hook.
 
   // Material-UI theme configuration
-  const theme = createTheme({
-    palette: {
-      secondary: {
-        main: green[500],
+  const theme = createTheme({ // Creating a custom theme using createTheme function.
+    palette: { // Configuring palette for the theme.
+      secondary: { // Defining secondary palette color.
+        main: green[500], // Setting the main color to green with shade 500.
       },
     },
   });
-
-  // Function for handling search input
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  // Function to handle search execution
-  const handleSearchExecute = () => {
-    console.log("Search query:", searchTerm);
-    // Add your search execution logic here
-  };
-
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Film Findr
-          </Typography>
-          <Button color="inherit" href="http://localhost:3009">Home</Button>
-          <Button color="inherit" href="/login">Login</Button>
-          <Button color="inherit" href="http://localhost:3000/register">Register</Button>
-          <Button color="inherit" href="/page3">Profile</Button>
-          <Button color="inherit" href="http://localhost:3000/dashboard">Dashboard</Button>
-        </Toolbar>
-      </AppBar>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 'calc(100vh - 64px)', // Adjust height based on AppBar height
-          backgroundImage: 'url("background.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          pt: 8, // Padding top to push the content below AppBar
+  
+  return ( // Returning JSX for rendering UI.
+    <ThemeProvider theme={theme}> {/* Wrapping the component with ThemeProvider to apply the custom theme. */}
+      <CssBaseline /> {/* Applying CssBaseline to reset browser styling. */}
+      <Box // Creating a Box component for layout purposes.
+        sx={{ // Using sx prop for styling.
+          display: 'flex', // Setting display property to flex.
+          flexDirection: 'column', // Setting flexDirection property to column.
+          justifyContent: 'center', // Setting justifyContent property to center.
+          alignItems: 'center', // Setting alignItems property to center.
+          height: 'calc(100vh - 64px)', // Setting height property dynamically based on viewport height minus 64px.
+          backgroundImage: 'url("background.jpg")', // Setting background image.
+          backgroundSize: 'cover', // Setting background size to cover.
+          backgroundPosition: 'center', // Setting background position to center.
+          pt: 8, // Setting padding top to 8.
         }}
       >
-        <Typography variant="h4" sx={{ mb: 2, color: 'white' }}>
-          Film Findr
+        <Typography variant="h4" sx={{ mb: 2, color: 'white' }}> {/* Creating Typography component with variant h4 for header text. */}
+          Film Findr {/* Text content for the header. */}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '45%', justifyContent: 'flex-end' }}>
-          <TextField
-            id="search-bar"
-            variant="outlined"
-            placeholder="Search for movies/questions?"
-            type="search"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            sx={{
-              width: '75%', // Adjust the width as needed
-              input: { color: 'white', fontWeight: 'bold' }, // Styles the text color inside the search bar
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'blue', // Styles the border color
-                },
-                '&:hover fieldset': {
-                  borderColor: 'red', // Styles the border color on hover
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: 'green', // Styles the border color on focus
-                },
-              },
-            }}
-            InputProps={{
-              style: { fontWeight: 'bold' }, // Makes the placeholder text bold
-            }}
-            fullWidth // Makes the TextField full width
-          />
-          <IconButton onClick={handleSearchExecute} sx={{ color: 'white' }}>
-            <SearchIcon />
-         </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '45%', justifyContent: 'flex-end' }}> {/* Creating a Box for layout purposes. */}
+          {/* This box seems to be intended for containing search-related components, but it's currently empty. */}
         </Box>
       </Box>
-    </ThemeProvider>
+    </ThemeProvider> /* Closing ThemeProvider component. */
   );
 }

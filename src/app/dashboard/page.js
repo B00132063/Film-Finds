@@ -1,105 +1,102 @@
-'use client';
+// Import React and necessary hooks and components from the React and Material-UI libraries
+'use client'
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Grid, Button, CssBaseline, AppBar, Toolbar } from '@mui/material';
+import { Box, Container, Grid, Button, CssBaseline, AppBar, Toolbar, TextField } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
 
-// Mock data for demonstration
-useEffect(() => {
-  fetch("api/getProducts")
-      .then((res) => res.json())
-      .then((data) => {
-          setData(data);
-      });
-})
+// Define the Dashboard component
+const Dashboard = () => {
+    // State variables to hold movies data and search term
+    const [movies, setMovies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
-const Slideshow = ({ movies }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+    // Effect hook to fetch movies data when component mounts
+    useEffect(() => {
+        fetchMovies();
+    }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide === movies.length - 1 ? 0 : prevSlide + 1));
-    }, 3000);
+    // Function to fetch movies data from the API
+    const fetchMovies = (query = '') => {
+        let url = 'http://localhost:3000/api/getfilms';
+        if (query) {
+            url += `?query=${query}`;
+        }
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data)
+                setMovies(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching movies:", error);
+            });
+    };
 
-    return () => clearInterval(interval);
-  }, [movies]); // Make sure to include movies as a dependency
+    // Function to handle search button click event
+    const handleSearch = () => {
+        fetchMovies(searchTerm);
+    };
 
-  return (
-    <Box>
-      <img src={movies[currentSlide].image} alt={movies[currentSlide].title} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} />
-    </Box>
-  );
+    // Theme customization using MUI's createTheme function
+    const theme = createTheme({
+        palette: {
+            secondary: {
+                main: green[500],
+            },
+        },
+    });
+
+    // Render the Dashboard component
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AppBar position="static">
+                <Toolbar>
+                    {/* Search input field */}
+                    <TextField
+                        label="Search movies"
+                        variant="outlined"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {/* Search button */}
+                    <Button variant="contained" onClick={handleSearch}>Search</Button>
+                </Toolbar>
+            </AppBar>
+            {/* Container for displaying movie data */}
+            <Container>
+                <Grid container spacing={2}>
+                    {/* Mapping through movies array to display each movie */}
+                    {movies.map((movie) => (
+                        <Grid item xs={12} key={movie._id}>
+                            {/* Box containing movie information */}
+                            <Box p={2} bgcolor="white" boxShadow={3} textAlign="center">
+                                <div>Title: {movie.title}</div>
+                                <div>Year: {movie.year}</div>
+                                <div>Rated: {movie.rated}</div>
+                                <div>Released: {movie.released}</div>
+                                <div>Runtime: {movie.runtime}</div>
+                                <div>Genre: {movie.genre}</div>
+                                <div>Director: {movie.director}</div>
+                                <div>Writer: {movie.writer}</div>
+                                <div>Actors: {movie.actors}</div>
+                                <div>Plot: {movie.plot}</div>
+                                <div>Language: {movie.language}</div>
+                                <div>Country: {movie.country}</div>
+                                <div>Awards: {movie.awards}</div>
+                                {/* Image displaying movie poster */}
+                                <img src={movie.poster} alt={movie.title} style={{ width: '100%' }} />
+                                {/* Button to add movie to profile */}
+                                <Button variant="outlined">Add to Profile</Button>
+                            </Box>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Container>
+        </ThemeProvider>
+    );
 };
 
-const NavBar = () => {
-  return (
-    <AppBar position="static">
-      <Toolbar>
-      <Button color="inherit" href="http://localhost:3000">Home</Button>
-          <Button color="inherit" href="/page2">Login</Button>
-          <Button color="inherit" href="http://localhost:3000/register">Register</Button>
-          <Button color="inherit" href="/page3">Profile</Button>
-          <Button color="inherit" href="http://localhost:3000/dashboard">Dashboard</Button>
-      </Toolbar>
-    </AppBar>
-  );
-};
-
-const Page = () => {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    // Simulating API call with mock data
-    setData(mockMovies);
-  }, []);
-
-  if (!data) return <p>Loading...</p>;
-
-  const theme = createTheme({
-    palette: {
-      secondary: {
-        main: green[500],
-      },
-    },
-  });
-
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          backgroundImage: 'url("background.jpg")', // Replace "background.jpg" with your image path
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <NavBar />
-        <Container>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              {/* Slideshow component */}
-              <Slideshow movies={data} />
-            </Grid>
-            <Grid item xs={6}>
-              {/* Box with movie synopsis */}
-              <Grid container spacing={2}>
-                {data.map((movie) => (
-                  <Grid item xs={12} key={movie.id}>
-                    <Box p={2} bgcolor="white" boxShadow={3} textAlign="center">
-                      <div>{movie.title}</div>
-                      <div>{movie.synopsis}</div>
-                      <Button variant="outlined">Add to Cart</Button>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-    </ThemeProvider>
-  );
-};
-
-export default Page;
+// Export the Dashboard component as default
+export default Dashboard;

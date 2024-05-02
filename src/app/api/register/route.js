@@ -1,75 +1,59 @@
-import React from 'react';
-import { CssBaseline, Box, TextField, Button, Typography } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+// Import the MongoClient class from the "mongodb" module
+import { MongoClient } from "mongodb";
 
-const theme = createTheme();
+// Import bcrypt for password hashing
+import bcrypt from 'bcrypt';
 
-export default function RegisterPage() {
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const pass = data.get('password');
+// Define an asynchronous function to handle user registration
+export default async function Register(req, res) {
+    // Check if the request method is POST
+    if (req.method === 'POST') {
+        // Extract username, password, and telephone from the request body
+        const { username, password, telephone } = req.body;
 
-    const response = await fetch('http://yourapiurl/register', {
-      method: 'GET',
-      params: new URLSearchParams({email, pass})
-    });
+        // Validate username, password, and telephone (e.g., check for empty values)
 
-    const result = await response.json();
-    console.log(result);
-  };
+        // Hash the password using bcrypt with salt rounds of 10
+        const hashedPassword = await bcrypt.hash(password, 10);
 
+        // MongoDB connection string
+        const url = "mongodb+srv://film-findr:12345678qwerty@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-  
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundImage: 'url("background-image.jpg")', // Set your background image here
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <Typography component="h1" variant="h5">
-          Register
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '300px' }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Register
-          </Button>
-        </Box>
-      </Box>
-    </ThemeProvider>
-  );
+        // Create a new MongoClient instance with the provided URL
+        const client = new MongoClient(url);
+
+        try {
+            // Connect to the MongoDB server
+            await client.connect();
+
+            // Access the specified database and collection
+            const databaseName = "film-findr";
+            const db = client.db(databaseName);
+            const collection = db.collection("login");
+
+            // Check if the user already exists in the database
+            const existingUser = await collection.findOne({ username });
+            if (existingUser) {
+                // If the user already exists, respond with a 400 status and an error message
+                return res.status(400).json({ message: 'User already exists' });
+            }
+
+            // Insert the new user into the database with hashed password
+            await collection.insertOne({ username, password: hashedPassword, telephone });
+
+            // Respond with a success message
+            res.status(201).json({ message: 'User registered successfully' });
+        } catch (error) {
+            // Handle any errors that occur during the process
+            console.error("Error:", error);
+            // Respond with an internal server error status and message
+            res.status(500).json({ error: "Internal server error" });
+        } finally {
+            // Close the MongoClient connection in all cases
+            await client.close();
+        }
+    } else {
+        // If the request method is not POST, respond with a 405 status and an error message
+        res.status(405).json({ error: 'Method Not Allowed' });
+    }
 }
