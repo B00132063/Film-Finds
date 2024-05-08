@@ -1,193 +1,85 @@
-'use client';
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Switch from '@mui/material/Switch';
+'use client'
+import React, { useState, useEffect } from 'react';
+import { Box, Container, Grid, Button, CssBaseline, AppBar, Toolbar, TextField } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { green } from '@mui/material/colors';
 
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import {ThemeProvider } from '@mui/material/styles';
+const Dashboard = () => {
+    const [movies, setMovies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-import { createTheme } from '@mui/material/styles';
-import { green, purple } from '@mui/material/colors';
+    const fetchMovies = (query = '') => {
+        let url = 'http://localhost:3001/api/getfilms';
+        if (query) {
+            url += `?query=${query}`;
+        }
+        console.log("Fetching movies from:", url);
+        fetch(url)
+            .then((res) => {
+                console.log("Response status:", res.status);
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Received movies data:", data);
+                setMovies(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching movies:", error);
+            });
+    };
 
+    const handleSearch = () => {
+        console.log("Search term:", searchTerm);
+        fetchMovies(searchTerm);
+    };
 
-export default function Page() {
+    const theme = createTheme({
+        palette: {
+            secondary: {
+                main: green[500],
+            },
+        },
+    });
 
+    useEffect(() => {
+        fetchMovies();
+    }, []);
 
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AppBar position="static">
+                <Toolbar>
+                    <TextField
+                        label="Search movies"
+                        variant="outlined"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <Button variant="contained" onClick={handleSearch}>Search</Button>
+                </Toolbar>
+            </AppBar>
+            <Container>
+                <Grid container spacing={2}>
+                    {loading && <div>Loading...</div>}
+                    {error && <div>Error: {error}</div>}
+                    {movies.map((movie) => (
+                        <Grid item xs={12} key={movie._id}>
+                            <Box p={2} bgcolor="white" boxShadow={3} textAlign="center">
+                                <div>Title: {movie.title}</div>
+                                <div>Year: {movie.year}</div>
+                                {/* Display other movie details */}
+                                <img src={movie.poster} alt={movie.title} style={{ width: '100%' }} />
+                                <Button variant="outlined">Add to Profile</Button>
+                            </Box>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Container>
+        </ThemeProvider>
+    );
+};
 
-  /*
-  This function does the actual work
-  calling the fetch to get things from the database.
-  */ 
-  async function runDBCallAsync(url) {
-
-
-    const res = await fetch(url);
-    const data = await res.json();
-
- 
-    if(data.data== "valid"){
-      console.log("registry is valid!")
-
-      
-    } else {
-
-      console.log("try again not valid  ")
-    }
-  }
-
-
-  /*
-
-  When the button is clicked, this is the event that is fired.
-  The first thing we need to do is prevent the default refresh of the page.
-  */
-	const handleSubmit = (event) => {
-		
-		console.log("handling submit");
-
-
-    event.preventDefault();
-  
-		const data = new FormData(event.currentTarget);
-
-
-    let email = data.get('email')
-		let pass = data.get('pass')
-
-    console.log("Sent email:" + email)
-    console.log("Sent pass:" + pass)
-
-
-    runDBCallAsync(`http://localhost:3000/api/register?email=${email}&pass=${pass}`)
-
-
-
-
-  }; // end handler
-
-
-
-
-  
-  const theme = createTheme({
-    palette: {
-     
-      secondary: {
-        main: green[500],
-      },
-    },
-  });
-  
-
-
-  
-  
-  return (
-    <ThemeProvider theme={theme}>
-    <Container component="main"  maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          
-        </Avatar>
-        <Typography component="h1" variant="h5">
-         Register
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="pass"
-            label="Pass"
-            type="pass"
-            id="pass"
-            autoComplete="current-password"
-          />
-
-
-        <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="pass2"
-            label="Pass2"
-            type="pass2"
-            id="pass2"
-            autoComplete="current-password"
-          />
-
-        <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="tel"
-            label="tel"
-            type="tel"
-            id="tel"
-            autoComplete="current-password"
-          />
-
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign In
-          </Button>
-
-
-
-
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
-
-    </Container>
-
-    </ThemeProvider>
-
-  );
-}
+export default Dashboard;

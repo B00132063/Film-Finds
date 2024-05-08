@@ -1,50 +1,50 @@
-export async function GET(req, res) {
+import express from 'express';
+import { MongoClient } from 'mongodb';
 
-  // Make a note we are on
-  // the api. This goes to the console.
-  console.log("in the api page")
+const app = express();
+const PORT = process.env.PORT || 3000;
 
+const url = "mongodb+srv://film-findr:12345678qwerty@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const client = new MongoClient(url);
+const databaseName = "film-findr";
+const PAGE_SIZE = 10;
 
-  // get the values
-  // that were sent across to us.
-  const { searchParams } = new URL(req.url)
-  const email = searchParams.get('email')
-  const pass = searchParams.get('pass')
+const preprocessQuery = (query) => {
+    const tokens = query.toLowerCase().split(' ');
+    const stopWords = ['a', 'an', 'the', 'is', 'in', 'of', 'and', 'or', 'with'];
+    const filteredTokens = tokens.filter(token => !stopWords.includes(token));
+    return filteredTokens.join(' ');
+};
 
-  console.log(email);
-  console.log(pass);
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
+app.get('/api/getfilms', async (req, res) => {
+    try {
+        console.log("Received request to fetch films:", req.query);
+        await client.connect();
+        console.log("Connected to MongoDB Atlas");
+        const db = client.db(databaseName);
+        const collection = db.collection("film");
+        const { query, page } = req.query;
+        const processedQuery = preprocessQuery(query);
+        console.log("Processed query:", processedQuery);
+        const pageNumber = parseInt(page) || 1;
+        const skip = (pageNumber - 1) * PAGE_SIZE;
+        const movies = await collection.find({ $text: { $search: processedQuery } }).skip(skip).limit(PAGE_SIZE).toArray();
+        console.log("Found movies:", movies);
+        res.status(200).json(movies);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    } finally {
+        await client.close();
+        console.log("MongoDB connection closed");
+    }
+});
 
- 
-
-  // database call goes here
-  const { MongoClient } = require('mongodb');
-
-  const url = 'mongodb://root:example@localhost:27017/';
-  const client = new MongoClient(url);
-
-  const dbName = 'app'; // database name
-
-  await client.connect();
-  console.log('Connected successfully to server');
-  const db = client.db(dbName);
-  const collection = db.collection('login'); // collection name
-
-  const findResult = await collection.find({"username":
-"sample@test.com"}).toArray();
-  console.log('Found documents =>', findResult);
-
-  let valid = false
-  if(findResult.length >0 ){
-valid = true;
-console.log("login valid")
-  } else {
-
-       valid = false;
-       console.log("login invalid")
-  }
-  
-//==========================================================
-  // at the end of the process we need to send something back.
-  return Response.json({ "data":"" + valid + ""})
-}
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
