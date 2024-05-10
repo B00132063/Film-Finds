@@ -12,6 +12,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+
     const fetchMovies = async (query = '') => {
         let url = 'http://localhost:3000/api/getfilms';
         if (query) {
@@ -26,7 +27,7 @@ const Dashboard = () => {
         } else {
             console.log("error")
         }
-        
+
     };
 
     const handleSearch = () => {
@@ -45,6 +46,7 @@ const Dashboard = () => {
     useEffect(() => {
         fetchMovies();
     }, []);
+
 
     return (
         <ThemeProvider theme={theme}>
@@ -71,7 +73,8 @@ const Dashboard = () => {
                                 <div>Year: {movie.year}</div>
                                 {/* Display other movie details */}
                                 <img src={movie.poster} alt={movie.title} style={{ width: '100%' }} />
-                                <Button variant="outlined">Add to Profile</Button>
+                                <Button onClick={() => putInCart(item.pname)} variant="outlined"> Add to Profile
+                                </Button>
                             </Box>
                         </Grid>
                     ))}
