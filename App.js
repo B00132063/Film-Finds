@@ -3,28 +3,23 @@ import './App.css';
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [allMovies, setAllMovies] = useState([
+    { title: "Spiderman", director: "Unknown", releaseYear: "Unknown", _id: "spiderman" },
+    { title: "Batman", director: "Unknown", releaseYear: "Unknown", _id: "batman" },
+    // Add more predefined movies here
+  ]);
 
   useEffect(() => {
-    // Make sure the port and the endpoint are correct
     fetch('http://localhost:3000/movies')
-      .then(response => {
-        console.log('HTTP response:', response);
-        if (!response.ok) {
-          // Throws an error with the status code if the response is not OK
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text(); // Use text() to initially receive the response as text
-      })
-      .then(text => {
-        try {
-          const data = JSON.parse(text); // Try to parse the text as JSON
-          console.log('Data received:', data);
-          setMovies(data);
-        } catch (err) {
-          // Catches parsing errors and logs the text that was not JSON
-          console.error('Error parsing JSON:', text);
-          throw err;
-        }
+      .then(response => response.json())
+      .then(data => {
+        setMovies(data);
+        // Update allMovies based on the fetched data
+        const updatedMovies = allMovies.map(movie => {
+          const found = data.find(m => m.title === movie.title);
+          return found || movie;
+        });
+        setAllMovies(updatedMovies);
       })
       .catch(err => console.error('Error fetching movies:', err));
   }, []);
@@ -32,11 +27,11 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Movies</h1>
+        <h1>Movies Catalogue</h1>
         <ul>
-          {movies.map(movie => (
-            <li key={movie._id}>
-              {movie.title} - Directed by {movie.director} (Released in {movie.releaseYear})
+          {allMovies.map(movie => (
+            <li key={movie._id} style={{ color: movie.director === "Unknown" ? "red" : "green" }}>
+              {movie.title} - {movie.director === "Unknown" ? "Not in database" : `Directed by ${movie.director} (Released in ${movie.releaseYear})`}
             </li>
           ))}
         </ul>
