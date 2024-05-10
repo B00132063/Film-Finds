@@ -1,50 +1,36 @@
-import express from 'express';
-import { MongoClient } from 'mongodb';
+// Import the MongoClient class from the "mongodb" module
+import { MongoClient } from "mongodb";
+import { NextResponse } from 'next/server';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// Define an asynchronous function to handle user registration
+export async function GET(req, res) {
 
-const url = "mongodb+srv://film-findr:12345678qwerty@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const client = new MongoClient(url);
-const databaseName = "film-findr";
-const PAGE_SIZE = 10;
+    const { searchParams } = new URL(req.url);
+    const title = searchParams.get("title");
 
-const preprocessQuery = (query) => {
-    const tokens = query.toLowerCase().split(' ');
-    const stopWords = ['a', 'an', 'the', 'is', 'in', 'of', 'and', 'or', 'with'];
-    const filteredTokens = tokens.filter(token => !stopWords.includes(token));
-    return filteredTokens.join(' ');
-};
+    let movies = []
 
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
-});
+    const url = "mongodb+srv://film-findr:12345678qwerty@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+    const client = new MongoClient(url);
+    const databaseName = "film-findr";
+    // const PAGE_SIZE = 10;
 
-app.get('/api/getfilms', async (req, res) => {
-    try {
-        console.log("Received request to fetch films:", req.query);
-        await client.connect();
-        console.log("Connected to MongoDB Atlas");
-        const db = client.db(databaseName);
-        const collection = db.collection("film");
-        const { query, page } = req.query;
-        const processedQuery = preprocessQuery(query);
-        console.log("Processed query:", processedQuery);
-        const pageNumber = parseInt(page) || 1;
-        const skip = (pageNumber - 1) * PAGE_SIZE;
-        const movies = await collection.find({ $text: { $search: processedQuery } }).skip(skip).limit(PAGE_SIZE).toArray();
-        console.log("Found movies:", movies);
-        res.status(200).json(movies);
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ error: "Internal server error" });
-    } finally {
-        await client.close();
-        console.log("MongoDB connection closed");
+    // console.log("Received request to fetch films:", await req.json());
+    await client.connect();
+    // console.log("Connected to MongoDB Atlas");
+    const db = client.db(databaseName);
+    const collection = db.collection("film");
+
+    if(title) {
+        movies = await collection.find({
+            $or: [
+              { title: { $regex: '.*' + title + '.*' }},
+              { plot: { $regex: '.*' + title + '.*' }},
+            ],
+          }).toArray();
+    } else {
+        movies = await collection.find({}).toArray();
     }
-});
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+    return NextResponse.json(movies);
+}

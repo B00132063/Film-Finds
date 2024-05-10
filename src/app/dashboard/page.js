@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, Container, Grid, Button, CssBaseline, AppBar, Toolbar, TextField } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
+import * as mobilenet from '@tensorflow-models/mobilenet';
+import * as tf from '@tensorflow/tfjs';
 
 const Dashboard = () => {
     const [movies, setMovies] = useState([]);
@@ -10,24 +12,21 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchMovies = (query = '') => {
-        let url = 'http://localhost:3001/api/getfilms';
+    const fetchMovies = async (query = '') => {
+        let url = 'http://localhost:3000/api/getfilms';
         if (query) {
-            url += `?query=${query}`;
+            url += `?title=${query}`;
         }
-        console.log("Fetching movies from:", url);
-        fetch(url)
-            .then((res) => {
-                console.log("Response status:", res.status);
-                return res.json();
-            })
-            .then((data) => {
-                console.log("Received movies data:", data);
-                setMovies(data);
-            })
-            .catch((error) => {
-                console.error("Error fetching movies:", error);
-            });
+
+        const res = await fetch(url);
+        if(res.ok) {
+            const data = await res.json();
+            setMovies(data);
+            console.log("Successfully get movies")
+        } else {
+            console.log("error")
+        }
+        
     };
 
     const handleSearch = () => {

@@ -1,108 +1,104 @@
 'use client'
-import React, { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { green } from '@mui/material/colors';
+import { Button, TextField } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { UserContext } from "@/contexts/user.context";
 
-export default function LoginPage() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+const Login = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    // We are consuming our user-management context to
+    // get & set the user details here
+    const { user, fetchUser, emailPasswordLogin } = useContext(UserContext);
+
+    // We are using React's "useState" hook to keep track
+    //  of the form values.
+    const [form, setForm] = useState({
+        email: "",
+        password: ""
+    });
+
+    // This function will be called whenever the user edits the form.
+    const onFormInputChange = (event) => {
+        const { name, value } = event.target;
+        setForm({ ...form, [name]: value });
+    };
+
+    // This function will redirect the user to the
+    // appropriate page once the authentication is done.
+    const redirectNow = () => {
+        const redirectTo = location.search.replace("?redirectTo=", "");
+        navigate(redirectTo ? redirectTo : "/");
+    }
+
+    // Once a user logs in to our app, we don’t want to ask them for their
+    // credentials again every time the user refreshes or revisits our app,
+    // so we are checking if the user is already logged in and
+    // if so we are redirecting the user to the home page.
+    // Otherwise we will do nothing and let the user to login.
+    const loadUser = async () => {
+        if (!user) {
+            const fetchedUser = await fetchUser();
+            if (fetchedUser) {
+                // Redirecting them once fetched.
+                redirectNow();
+            }
+        }
+    }
+
+    // This useEffect will run only once when the component is mounted.
+    // Hence this is helping us in verifying whether the user is already logged in
+    // or not.
+    useEffect(() => {
+        loadUser(); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // This function gets fired when the user clicks on the "Login" button.
+    const onSubmit = async (event) => {
         try {
-            const res = await fetch(`http://localhost:3000/api/login?username=${username}&password=${password}`);
-            const data = await res.json();
-            if (data.data === "valid") {
-                console.log("Login successful!");
-                window.location.href = "/dashboard"; // Redirect to dashboard page
-            } else {
-                console.log("Invalid credentials, please try again");
+            // Here we are passing user details to our emailPasswordLogin
+            // function that we imported from our realm/authentication.js
+            // to validate the user credentials and log in the user into our App.
+            const user = await emailPasswordLogin(form.email, form.password);
+            if (user) {
+                redirectNow();
             }
         } catch (error) {
-            console.error('Error:', error);
+            if (error.statusCode === 401) {
+                alert("Invalid username/password. Try again!");
+            } else {
+                alert(error);
+            }
+
         }
     };
 
-    const theme = createTheme({
-        palette: {
-            secondary: {
-                main: green[500],
-            },
-        },
-    });
-
-    return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Container component="main" maxWidth="xs">
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }} />
-                    <Typography component="h1" variant="h5">
-                        Login
-                    </Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="username"
-                            label="Username"
-                            name="username"
-                            autoComplete="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Sign In
-                        </Button>
-                        <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Forgot password?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link href="http://localhost:3000/register" variant="body2">
-                                    {"Don't have an account? Sign Up"}
-                                </Link>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Container>
-        </ThemeProvider>
-    );
+    return <form style={{ display: "flex", flexDirection: "column", maxWidth: "300px", margin: "auto" }}>
+        <h1>Login</h1>
+        <TextField
+            label="Email"
+            type="email"
+            variant="outlined"
+            name="email"
+            value={form.email}
+            onChange={onFormInputChange}
+            style={{ marginBottom: "1rem" }}
+        />
+        <TextField
+            label="Password"
+            type="password"
+            variant="outlined"
+            name="password"
+            value={form.password}
+            onChange={onFormInputChange}
+            style={{ marginBottom: "1rem" }}
+        />
+        <Button variant="contained" color="primary" onClick={onSubmit}>
+            Login
+        </Button>
+        <p>Don't have an account? <Link to="/signup">Signup</Link></p>
+    </form>
 }
+
+export default Login;

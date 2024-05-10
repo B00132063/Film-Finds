@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google' // Importing the Inter font from Google Fonts via next/font/google.
 import './globals.css' // Importing global CSS styles from a file named 'globals.css'.
-import { metadata } from './metadata'; // Importing metadata from a separate file.
+import { metadata } from './MetaData'; // Importing metadata from a separate file.
 
 import AppBar from "@mui/material/AppBar"; // Importing the AppBar component from Material-UI.
 import Toolbar from "@mui/material/Toolbar"; // Importing the Toolbar component from Material-UI.

@@ -1,49 +1,52 @@
-// Import the MongoClient class from the 'mongodb' module
-import { MongoClient } from 'mongodb';
+// server.js
 
-// Define an asynchronous function to handle login requests
-export default async function loginHandler(req, res) {
-  // Log a message indicating that the login API page is accessed
-  console.log("In the login api page");
+const express = require('express');
+const bodyParser = require('body-parser');
+const { MongoClient } = require('mongodb');
 
-  // Extract username and password from the request query parameters
-  const { username, password } = req.query;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-  // MongoDB connection string
-  const url = 'mongodb+srv://film-findr:12345678qwerty@cluster0.uj4ky6r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+// MongoDB connection string
+const url = 'mongodb://localhost:27017';
+const dbName = 'Film-Findr';
 
-  // Create a new MongoClient instance with the provided URL
-  const client = new MongoClient(url);
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
 
-  // Database name
-  const dbName = 'film-findr';
-
+// POST endpoint for login verification
+app.post('/api/login', async (req, res) => {
   try {
-    // Connect to the MongoDB server
+    // Extract username and password from request body
+    const { username, password } = req.body;
+
+    // Connect to MongoDB
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
-    // Log a success message upon successful connection
-    console.log('Connected successfully to server');
 
     // Access the specified database and collection
     const db = client.db(dbName);
     const collection = db.collection('login');
 
-    // Find a document with the provided username and password in the 'login' collection
-    const findResult = await collection.findOne({ "username": username, "password": password });
+    // Find user with the provided username and password
+    const user = await collection.findOne({ username, password });
 
-    // If a document is found, respond with 'valid', otherwise respond with 'notvalid'
-    if (findResult) {
-      res.status(200).json({ "data": "valid" });
+    // Check if user exists
+    if (user) {
+      res.json({ success: true, message: 'Login successful' });
     } else {
-      res.status(200).json({ "data": "notvalid" });
+      res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-  } catch (error) {
-    // Handle any errors that occur during the process
-    console.error('Error:', error);
-    // Respond with an internal server error status and message
-    res.status(500).json({ "error": "Internal server error" });
-  } finally {
-    // Close the MongoClient connection in all cases
+
+    // Close the MongoDB connection
     await client.close();
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
-}
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

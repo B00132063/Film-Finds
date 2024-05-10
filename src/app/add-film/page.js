@@ -19,8 +19,13 @@ export default function Page() {
     useEffect(() => {
         fetch("http://localhost:3000/api/getfilms")
             .then(res => res.json())
-            .then(data => setData(data));
+            .then(data => {
+                // Assign a unique 'id' property to each row
+                const newData = data.map((row, index) => ({ ...row, id: index + 1 }));
+                setData(newData);
+            });
     }, []);
+
 
     const handleSubmit = (event) => {
         event.preventDefault();

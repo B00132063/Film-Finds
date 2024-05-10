@@ -1,4 +1,3 @@
-// Import the MongoClient class from the "mongodb" module
 import { MongoClient } from "mongodb";
 
 // Define an asynchronous function to handle GET requests
